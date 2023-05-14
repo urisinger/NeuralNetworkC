@@ -1,0 +1,9 @@
+# ninja log v5
+16	352	7057976344321681	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	7ef4b446e2893d78
+5	355	7057976344351661	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	e8e3a6041e5b83bb
+11	372	7057976344621630	CMakeFiles/NeuralNetwork.dir/src/LinearAlgebra.c.obj	be045c51a31728cf
+373	587	7057976346751609	NeuralNetwork.exe	a25817822a5d1c77
+17	308	7057976661454513	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	e8e3a6041e5b83bb
+309	522	7057976663569940	NeuralNetwork.exe	a25817822a5d1c77
+17	281	7057976882235047	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	7ef4b446e2893d78
+282	488	7057976884250682	NeuralNetwork.exe	a25817822a5d1c77

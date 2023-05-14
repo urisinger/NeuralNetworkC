@@ -17,6 +17,6 @@ void NewLayer(Layer* LastLayer, int size, Activation ActivationLayer, Activation
 void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation ActivationDervtive);
 
 Vector* Forward(Layer* layer);
-void BackPropogate(Layer* layer, Vector* error_grad, float learnrate);
+void BackPropogate(Layer* layer, Vector* error_grad, double learnrate);
 
 void FreeNetwork(Layer* layer);

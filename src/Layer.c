@@ -11,8 +11,8 @@ Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation
 	newlayer->size = size;
 	newlayer->NextLayer = 0;
 	newlayer->LastLayer = 0;
-	newlayer->Weights = NewRandMat(size, input->size, -1, 1);
-	newlayer->Biases = NewRandVec(size, -1, 1);
+	newlayer->Weights = NewRandMat(size, input->size, 0, 1);
+	newlayer->Biases = NewRandVec(size, 0, 1);
 	newlayer->ActivationLayer = ActivationLayer;
 	newlayer->ActivationDervtive = ActivationDervtive;
 
@@ -26,8 +26,8 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
 	}
 	Layer* tmp = LastLayer->NextLayer;
 	tmp->size = size;
-	tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
-	tmp->Biases = NewRandVec(size, -1, 1);
+	tmp->Weights = NewRandMat(size, LastLayer->size, 0, 1);
+	tmp->Biases = NewRandVec(size, 0, 1);
 	tmp->ActivationLayer = ActivationLayer;
 	tmp->ActivationDervtive = ActivationDervtive;
 	tmp->input = 0;
@@ -70,16 +70,14 @@ void FreeNetwork(Layer* layer) {
 
 void BackPropogate(Layer*layer, Vector* error_grad, double learnrate) {
 
+	Matrix* tmp = DotTransposeVec(error_grad ,layer->input);
 
-
-	Matrix* tmp = DotTransposeVec(layer->input, error_grad);
-
-	Matrix* weights_grad = MatScaler(tmp, learnrate);
+	Matrix* weights_grad = MatScaler(tmp, -learnrate);
 
 	Matrix* weight_transpose = Transpose(layer->Weights);
 	Vector* next_err = DotVecMat(weight_transpose, error_grad);
 
-	Vector* scaled_out = VecScaler(error_grad, learnrate);
+	Vector* scaled_out = VecScaler(error_grad, -learnrate);
 
 	Vector* new_bias = AddVec(layer->Biases, scaled_out);
 	FreeVec(layer->Biases);

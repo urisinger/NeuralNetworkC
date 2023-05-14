@@ -190,11 +190,11 @@ Vector* DotVecMat(Matrix* Mat1, Vector* Vec) {
 }
 
 Matrix* DotTransposeVec(Vector* Vec1, Vector* Vec2) {
-	Matrix* MatOut = NewMat(Vec2->size, Vec1->size);
+	Matrix* MatOut = NewMat(Vec1->size, Vec2->size);
 
-	for (int i = 0; i < Vec2->size; ++i) {
-		for (int j = 0; j < Vec1->size; ++j) {
-			MatOut->vals[i][j] = Vec1->vals[j] * Vec2->vals[i];
+	for (int i = 0; i < Vec1->size; ++i) {
+		for (int j = 0; j < Vec2->size; ++j) {
+			MatOut->vals[i][j] = Vec1->vals[i] * Vec2->vals[j];
 		}
 	}
 	return MatOut;

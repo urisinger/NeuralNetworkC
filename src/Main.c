@@ -5,12 +5,12 @@
 
 #include "Layer.h"
 
-float sigmoid(float x) {
-	return (1/(1+exp(x)));
+double sigmoid(double x) {
+	return (tanh(x));
 }
 
-float sigmoidder(float x) {
-	return (sigmoid(x)*(1- sigmoid(x)));
+double sigmoidder(double x) {
+	return (1-tanh(x)*tanh(x));
 }
 
 void main()
@@ -19,7 +19,9 @@ void main()
 
 	Vector* inputReal = NewUniformVec(2,1);
 
-	Layer* HeadLayer = NewNetwork(inputReal,5, sigmoid, sigmoidder);
+	Layer* HeadLayer = NewNetwork(inputReal,3, sigmoid, sigmoidder);
+
+	NewTailLayer(HeadLayer, 5, sigmoid, sigmoidder);
 
 	NewTailLayer(HeadLayer, 1, sigmoid, sigmoidder);
 	
@@ -27,30 +29,97 @@ void main()
 	Vector* err;
 
 	for (int i = 0; i < 10000; ++i) {
-		inputReal->vals[0] = rand()%2;
-		inputReal->vals[1] = rand()%2;
+
+		inputReal->vals[0] = 0;
+		inputReal->vals[1] = 0;
 
 		err = NewVec(1);
 
 		output = Forward(HeadLayer);
 		err->vals[0] = (output->vals[0] - (!(int)(inputReal->vals[0]) != !(int)(inputReal->vals[1])));
-		//printf("%f : ", err->vals[0]);
-		//PrintVec(output);
+		//printf("\n %f : ", err->vals[0]);
+
 		FreeVec(output);
-		//printf("\n");
+	
+		BackPropogate(HeadLayer->NextLayer->NextLayer, err, 0.1);
 
-		//PrintMat(HeadLayer->Weights);
+		inputReal->vals[0] = 1;
+		inputReal->vals[1] = 0;
 
-		BackPropogate(HeadLayer->NextLayer, err, 0.1f);
+		err = NewVec(1);
 
+		output = Forward(HeadLayer);
+		err->vals[0] = (output->vals[0] - (!(int)(inputReal->vals[0]) != !(int)(inputReal->vals[1])));
+		//printf("\n %f", err->vals[0]);
+
+
+		FreeVec(output);
+
+		BackPropogate(HeadLayer->NextLayer->NextLayer, err, 0.1);
+
+		inputReal->vals[0] = 0;
+		inputReal->vals[1] = 1;
+
+		err = NewVec(1);
+
+		output = Forward(HeadLayer);
+		err->vals[0] = (output->vals[0] - (!(int)(inputReal->vals[0]) != !(int)(inputReal->vals[1])));
+		//printf("\n %f", err->vals[0]);
+
+		FreeVec(output);
+
+		BackPropogate(HeadLayer->NextLayer->NextLayer, err, 0.1);
+
+		inputReal->vals[0] = 1;
+		inputReal->vals[1] = 1;
+
+		err = NewVec(1);
+
+		output = Forward(HeadLayer);
+		err->vals[0] = (output->vals[0] - (!(int)(inputReal->vals[0]) != !(int)(inputReal->vals[1])));
+		//mkiiprintf("\n %f", err->vals[0]);
+
+		FreeVec(output);
+
+		BackPropogate(HeadLayer->NextLayer->NextLayer, err, 0.1);
 	}
 
+	printf("\n\n");
 	inputReal->vals[0] = 1;
 	inputReal->vals[1] = 1;
 
-	printf("%d : ", (!(int)(inputReal->vals[0]) != !(int)(inputReal->vals[1])));
-	PrintVec(Forward(HeadLayer));
+	output = Forward(HeadLayer);
 
+	PrintVec(output);
+	printf("\n");
+	FreeVec(output);
+
+	inputReal->vals[0] = 0;
+	inputReal->vals[1] = 1;
+
+	output = Forward(HeadLayer);
+
+	PrintVec(output);
+	printf("\n");
+	FreeVec(output);
+
+	inputReal->vals[0] = 1;
+	inputReal->vals[1] = 0;
+
+	output = Forward(HeadLayer);
+
+	PrintVec(output);
+	printf("\n");
+	FreeVec(output);
+
+	inputReal->vals[0] = 0;
+	inputReal->vals[1] = 0;
+
+	output = Forward(HeadLayer);
+
+	PrintVec(output);
+	printf("\n");
+	FreeVec(output);
 
 	FreeNetwork(HeadLayer);
 }

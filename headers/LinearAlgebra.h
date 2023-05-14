@@ -1,7 +1,7 @@
 #pragma once
 
 
-typedef float (*Activation)(float);
+typedef double (*Activation)(double);
 
 typedef struct Matrix {
 	double** vals;
