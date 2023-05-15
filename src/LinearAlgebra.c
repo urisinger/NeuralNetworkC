@@ -1,6 +1,6 @@
 #include "LinearAlgebra.h"
 #include <stdlib.h>
-#include <stdio.h>
+#include <stdint.h>
 #include <time.h>
 
 Matrix* NewMat(int rows, int cols) {
@@ -22,6 +22,33 @@ Matrix* NewUniformMat(int rows, int cols, double val) {
 	UniformMat(Mat, val);
 	return Mat;
 }
+
+void GetSample(Matrix* mat, FILE* dataFile, size_t offset) {
+	fseek(dataFile, offset, SEEK_SET);
+
+	for (int i = 0; i < mat->rows; i++) {
+		for (int j = 0; j < mat->cols; j++) {
+			unsigned char pixel;
+			fread(&pixel, sizeof(unsigned char), 1, dataFile);
+			mat->vals[i][j] = (double)pixel / 255.0;  // Normalize the pixel value between 0 and 1
+		}
+	}
+}
+
+
+void GetLabel(Matrix* mat, FILE* dataFile, size_t offset) {
+	fseek(dataFile, offset, SEEK_SET);
+
+	for (int i = 0; i < mat->rows; i++) {
+		unsigned char label;
+		fread(&label, sizeof(unsigned char), 1, dataFile);
+
+		for (int j = 0; j < mat->cols; j++) {
+			mat->vals[i][j] = (j == label) ? 1.0 : 0.0;
+		}
+	}
+}
+
 
 Matrix* NewRandMat(int rows, int cols, double min, double max) {
 	Matrix* Mat = NewMat(rows, cols);

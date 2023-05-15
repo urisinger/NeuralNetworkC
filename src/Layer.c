@@ -57,8 +57,6 @@ void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
     for(int i = 0; i < Sample->rows; ++i){
         Vector* err = NewVec(Labels->cols);
         head->input->vals = Sample->vals[i];
-        PrintVec(head->input);
-        printf("\n");
         output = Forward(head);
         for(int j = 0; j < output->size; ++j){
             err->vals[j] = 2.0*(output->vals[j] - Labels->vals[i][j])/output->size;

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <stdio.h>
 
 typedef double (*Activation)(double);
 
@@ -36,6 +36,8 @@ void PrintVec(Vector* Vec);
 //fillers
 void UniformMat(Matrix* Mat, double val);
 void RandomizeMat(Matrix* Mat, double min, double max);
+void GetSample(Matrix* Mat, FILE* dataFile, size_t offset);
+void GetLabel(Matrix* mat, FILE* dataFile, size_t offset);
 
 void UniformVec(Vector* Vec, double val);
 void RandomizeVec(Vector* Vec, double min, double max);
