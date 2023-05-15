@@ -1,0 +1,3 @@
+C:/dev/NeuralNetwork/bin/x86-release/CMakeFiles/NeuralNetwork.dir
+C:/dev/NeuralNetwork/bin/x86-release/CMakeFiles/edit_cache.dir
+C:/dev/NeuralNetwork/bin/x86-release/CMakeFiles/rebuild_cache.dir

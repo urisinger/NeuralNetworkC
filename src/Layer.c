@@ -61,8 +61,10 @@ void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
         for(int j = 0; j < output->size; ++j){
             err->vals[j] = 2.0*(output->vals[j] - Labels->vals[i][j])/output->size;
         }
+
         BackPropogate(FindTail(head), err, learnrate);
         FreeVec(output);
+
     }
 }
 
@@ -76,8 +78,10 @@ Vector* Forward(Layer* layer){
 	if (!layer->NextLayer)
 		return next_in;
 
-	if (layer->NextLayer->input)
+	if (layer->NextLayer->input) {
 		FreeVec(layer->NextLayer->input);
+		layer->NextLayer->input = NULL;
+	}
 
 	layer->NextLayer->input = next_in;
 	Forward(layer->NextLayer);
@@ -108,7 +112,7 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 	layer->Biases = new_bias;
 
 	Matrix* new_weight = AddMat(layer->Weights, weights_grad);
-    FreeMat(layer->Weights);
+	FreeMat(layer->Weights);
 	FreeMat(weights_grad);
 	layer->Weights = new_weight;
 
@@ -120,7 +124,9 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
 
 	if (!layer->LastLayer)
+		free(next_err);
 		return;
+
 	for (int i = 0; i < next_err->size; ++i) {
 		next_err->vals[i] *= layer->ActivationDervtive(layer->input->vals[i]);
 	}
