@@ -15,7 +15,7 @@ typedef struct Vector {
 
 //constactors
 Matrix* NewMat(int rows, int cols);
-Matrix* NewUniformMat(int rows, int cols, float val);
+Matrix* NewUniformMat(int rows, int cols, double val);
 Matrix* NewRandMat(int rows, int cols, double min, double max);
 Matrix* CopyMat(Matrix* OldMat);
 

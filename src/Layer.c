@@ -11,8 +11,8 @@ Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation
 	newlayer->size = size;
 	newlayer->NextLayer = 0;
 	newlayer->LastLayer = 0;
-	newlayer->Weights = NewRandMat(size, input->size, 0, 1);
-	newlayer->Biases = NewRandVec(size, 0, 1);
+	newlayer->Weights = NewRandMat(size, input->size, -1, 1);
+	newlayer->Biases = NewRandVec(size, -1, 1);
 	newlayer->ActivationLayer = ActivationLayer;
 	newlayer->ActivationDervtive = ActivationDervtive;
 
@@ -26,8 +26,8 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
 	}
 	Layer* tmp = LastLayer->NextLayer;
 	tmp->size = size;
-	tmp->Weights = NewRandMat(size, LastLayer->size, 0, 1);
-	tmp->Biases = NewRandVec(size, 0, 1);
+	tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
+	tmp->Biases = NewRandVec(size, -1, 1);
 	tmp->ActivationLayer = ActivationLayer;
 	tmp->ActivationDervtive = ActivationDervtive;
 	tmp->input = 0;
@@ -35,12 +35,21 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
 	tmp->LastLayer = LastLayer;
 }
 
+Layer* FindTail(Layer* Head){
+    while (Head->NextLayer) {
+        Head = Head->NextLayer;
+    }
+    return(Head);
+}
+
 void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation ActivationDervtive) {
 	while (Head->NextLayer) {
 		Head = Head->NextLayer;
 	}
-	NewLayer(Head, size, ActivationLayer, ActivationDervtive);
+	NewLayer(FindTail(Head), size, ActivationLayer, ActivationDervtive);
 }
+
+
 
 Vector* Forward(Layer* layer){
 
@@ -84,7 +93,7 @@ void BackPropogate(Layer*layer, Vector* error_grad, double learnrate) {
 	layer->Biases = new_bias;
 
 	Matrix* new_weight = AddMat(layer->Weights, weights_grad);
-	FreeMat(layer->Weights);
+    FreeMat(layer->Weights);
 	FreeMat(weights_grad);
 	layer->Weights = new_weight;
 

@@ -14,6 +14,7 @@ typedef struct Layer {
 
 Layer* NewNetwork(Vector* input, int size, Activation ActivationLayer, Activation ActivationDervtive);
 void NewLayer(Layer* LastLayer, int size, Activation ActivationLayer, Activation ActivationDervtive);
+Layer* FindTail(Layer* Head);
 void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation ActivationDervtive);
 
 Vector* Forward(Layer* layer);

@@ -56,7 +56,7 @@ void PrintMat(Matrix* Mat) {
 
 void UniformMat(Matrix* Mat, double val) {
 	for (int i = 0; i < Mat->rows; ++i) {
-		for (int j = 0; i < Mat->cols; ++j) {
+		for (int j = 0; j < Mat->cols; ++j) {
 			Mat->vals[i][j] = val;
 		}
 	}
