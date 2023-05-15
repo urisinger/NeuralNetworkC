@@ -49,7 +49,24 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 	NewLayer(FindTail(Head), size, ActivationLayer, ActivationDervtive);
 }
 
-
+void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
+    if(head->input->size != Sample->cols){
+        exit(-1);
+    }
+    Vector *output;
+    for(int i = 0; i < Sample->rows; ++i){
+        Vector* err = NewVec(Labels->cols);
+        head->input->vals = Sample->vals[i];
+        PrintVec(head->input);
+        printf("\n");
+        output = Forward(head);
+        for(int j = 0; j < output->size; ++j){
+            err->vals[j] = 2.0*(output->vals[j] - Labels->vals[i][j])/output->size;
+        }
+        BackPropogate(FindTail(head), err, learnrate);
+        FreeVec(output);
+    }
+}
 
 Vector* Forward(Layer* layer){
 
@@ -77,7 +94,7 @@ void FreeNetwork(Layer* layer) {
 	free(layer);
 }
 
-void BackPropogate(Layer*layer, Vector* error_grad, double learnrate) {
+void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
 	Matrix* tmp = DotTransposeVec(error_grad ,layer->input);
 
