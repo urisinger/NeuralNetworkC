@@ -12,7 +12,10 @@ Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation
 	newlayer->NextLayer = 0;
 	newlayer->LastLayer = 0;
 	newlayer->Weights = NewRandMat(size, input->size, -1, 1);
+	newlayer->Weightoffset = NewUniformMat(size, input->size, 0);
+
 	newlayer->Biases = NewRandVec(size, -1, 1);
+	newlayer->BiasOffset = NewUniformVec(size, 0);
 	newlayer->ActivationLayer = ActivationLayer;
 	newlayer->ActivationDervtive = ActivationDervtive;
 
@@ -27,7 +30,9 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
 	Layer* tmp = LastLayer->NextLayer;
 	tmp->size = size;
 	tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
+	tmp->Weightoffset = NewUniformMat(size, LastLayer->size, 0);
 	tmp->Biases = NewRandVec(size, -1, 1);
+	tmp->BiasOffset = NewUniformVec(size, 0);
 	tmp->ActivationLayer = ActivationLayer;
 	tmp->ActivationDervtive = ActivationDervtive;
 	tmp->input = 0;
@@ -42,6 +47,27 @@ Layer* FindTail(Layer* Head){
     return(Head);
 }
 
+void AddOffsets(Layer* Head,int scaler) {
+	while (Head->NextLayer) {
+		Matrix* tmp_mat = AddMat(Head->Weights, Head->Weightoffset);
+		Matrix* new_mat = MatScaler(tmp_mat, 1.0 / scaler);
+		FreeMat(Head->Weights);
+		FreeMat(tmp_mat);
+		Head->Weights = new_mat;
+		UniformMat(Head->Weightoffset, 0);
+
+		Vector* tmp_vec = AddVec(Head->Biases, Head->BiasOffset);
+		Vector* new_vec = VecScaler(tmp_vec, 1.0 / scaler);
+
+		FreeVec(Head->Biases);
+		FreeVec(tmp_vec);
+		Head->Biases = new_vec;
+		UniformMat(Head->BiasOffset, 0);
+
+		Head = Head->NextLayer;
+	}
+}
+
 void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation ActivationDervtive) {
 	while (Head->NextLayer) {
 		Head = Head->NextLayer;
@@ -49,12 +75,13 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 	NewLayer(FindTail(Head), size, ActivationLayer, ActivationDervtive);
 }
 
-void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
+
+void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate,int start,int end){
     if(head->input->size != Sample->cols){
         exit(-1);
     }
     Vector *output;
-    for(int i = 0; i < Sample->rows; ++i){
+    for(int i = start; i < end; ++i){
         Vector* err = NewVec(Labels->cols);
         head->input->vals = Sample->vals[i];
         output = Forward(head);
@@ -66,12 +93,16 @@ void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
         FreeVec(output);
 
     }
+
+	AddOffsets(head,end-start);
 }
 
 Vector* Forward(Layer* layer){
 
 	Vector* tmp1 = DotVecMat(layer->Weights, layer->input);
 	Vector* next_in = AddVec(layer->Biases, tmp1);
+	Vector* in_copy = CopyVec(next_in);
+	layer->NoActiveInput = in_copy;
 	ApplyFuncVec(next_in, layer->ActivationLayer);
 	FreeVec(tmp1);
 
@@ -107,14 +138,14 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
 	Vector* scaled_out = VecScaler(error_grad, -learnrate);
 
-	Vector* new_bias = AddVec(layer->Biases, scaled_out);
-	FreeVec(layer->Biases);
-	layer->Biases = new_bias;
+	Vector* new_bias_offset = AddVec(layer->BiasOffset, scaled_out);
+	FreeVec(layer->BiasOffset);
+	layer->BiasOffset = new_bias_offset;
 
-	Matrix* new_weight = AddMat(layer->Weights, weights_grad);
-	FreeMat(layer->Weights);
+	Matrix* new_weight_offset = AddMat(layer->Weightoffset, weights_grad);
+	FreeMat(layer->Weightoffset);
 	FreeMat(weights_grad);
-	layer->Weights = new_weight;
+	layer->Weightoffset = new_weight_offset;
 
 	FreeVec(error_grad);
 	FreeVec(scaled_out);
@@ -127,8 +158,8 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 		free(next_err);
 		return;
 
-	for (int i = 0; i < next_err->size; ++i) {
-		next_err->vals[i] *= layer->ActivationDervtive(layer->input->vals[i]);
+	for (int i = 0; i < error_grad->size; ++i) {
+		next_err->vals[i] *= layer->ActivationDervtive(layer->NoActiveInput->vals[i]);
 	}
 	BackPropogate(layer->LastLayer,next_err ,learnrate);
 }

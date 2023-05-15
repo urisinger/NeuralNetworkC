@@ -6,7 +6,7 @@
 #include "Layer.h"
 
 double sigmoid(double x) {
-	return (1.0/(1+exp(x)));
+	return (1.0/(1+exp(-x)));
 }
 
 double sigmoidder(double x) {
@@ -16,6 +16,14 @@ double sigmoidder(double x) {
 
 double tanhder(double x) {
     return (1 - tanh(x) * tanh(x));
+}
+
+double relu(double x) {
+    return(x < 0 ? 0 : x);
+}
+
+double reluder(double x) {
+    return(x < 0 ? 0 : 1);
 }
 
 int ChangeEndianness(int value) {
@@ -62,8 +70,8 @@ void main()
     }
 
     srand(time(NULL));
-    Matrix* sample = NewMat(45000, 784);
-    Matrix* label = NewMat(45000, 10);
+    Matrix* sample = NewMat(50000, 784);
+    Matrix* label = NewMat(50000, 10);
 
     GetSample(sample, imageTrainFiles, 16);  // Read the first image starting at offset 16
 
@@ -79,18 +87,24 @@ void main()
         printf("\n");
     }
 
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,16, tanh, tanhder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,16, relu, reluder);
 
-    NewTailLayer(HeadLayer, 16, tanh, tanhder);
+    NewTailLayer(HeadLayer, 16, relu, reluder);
 
-    NewTailLayer(HeadLayer, 10, tanh, tanhder);
+
+    NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
 	Vector* output = NewVec(10);
 
-	for (int i = 0; i < 5; ++i) {
-        LearnSample(HeadLayer,sample,label,0.1);
+    for (int j = 0; j < 5; j++) {
+        for (int i = 0; i < 1000; ++i) {
+            LearnSample(HeadLayer, sample, label, 0.1, i * sample->rows / 1000, (i + 1) * sample->rows / 1000);
+        }
     }
 
+    PrintMat(HeadLayer->Weights);
+
+    Vector* err = NewVec(10);
 
     while (1) {
         int index;
@@ -106,11 +120,14 @@ void main()
                 max = output->vals[i];
                 maxnum = i;
             }
-
+            err->vals[i] = output->vals[i] - label->vals[index][i];
         }
 
-        PrintVec(output);
         PrintNum(sample, index);
+        printf("\n\n");
+        PrintVec(output);
+        printf("\n\n");
+        PrintVec(err);
         printf("%d", maxnum);
     }
 
