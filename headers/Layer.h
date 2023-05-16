@@ -1,6 +1,18 @@
 #pragma once
 #include "LinearAlgebra.h"
 
+
+//layer functions
+double sigmoid(double x);
+
+double sigmoidder(double x);
+
+double tanhder(double x);
+double relu(double x);
+
+double reluder(double x);
+
+
 typedef struct Layer {
     int size;
     struct Layer* NextLayer;

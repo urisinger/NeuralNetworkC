@@ -35,7 +35,7 @@ void PrintVec(Vector* Vec);
 
 //fillers
 void UniformMat(Matrix* Mat, double val);
-void RandomizeMat(Matrix* Mat, double min, double max);
+void RandomizeMat(Matrix* Mat, double min, double max);	
 void GetSample(Matrix* Mat, FILE* dataFile, size_t offset);
 void GetLabel(Matrix* mat, FILE* dataFile, size_t offset);
 
@@ -51,13 +51,14 @@ Matrix* SubMat(Matrix* Mat1, Matrix* Mat2);
 Matrix* MatScaler(Matrix* Mat, double scaler);
 Vector* VecScaler(Vector* Vec, double scaler);
 
+Vector* HadamardVec(Vector* vec1, Vector* vec2);
 
 Matrix* Dot(Matrix* Mat1, Matrix* Mat2);
 Vector* DotVecMat(Matrix* Mat1, Vector* Vec);
-Matrix* DotTransposeVec(Vector* Vec1, Vector* Vec2);
+Matrix* DotTransposeVecVec(Vector* Vec1, Vector* Vec2);
+Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2);
 
 Matrix* Transpose(Matrix* Mat);
-Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2);
 
 void ApplyFunc(Matrix* Mat, Activation function);
 Vector* ApplyFuncVec(Vector* Mat, Activation function);

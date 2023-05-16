@@ -178,6 +178,19 @@ Vector* VecScaler(Vector* Vec, double scaler) {
 	return prodact;
 }
 
+Vector* HadamardVec(Vector* vec1, Vector* vec2) {
+	if (vec1->size != vec2->size) {
+		exit(-1);  // Handle error: Vectors must have the same size
+	}
+
+	Vector* result = NewVec(vec1->size);
+	for (int i = 0; i < vec1->size; i++) {
+		result->vals[i] = vec1->vals[i] * vec2->vals[i];
+	}
+
+	return result;
+}
+
 Matrix* Dot(Matrix* Mat1, Matrix* Mat2) {
 	if (Mat1->cols != Mat2->rows) {
 		printf("Cant dot this! %dx%d incompatble with %dx%d", Mat1->rows, Mat1->cols, Mat2->rows, Mat2->cols);
@@ -217,7 +230,7 @@ Vector* DotVecMat(Matrix* Mat1, Vector* Vec) {
 	return VecOut;
 }
 
-Matrix* DotTransposeVec(Vector* Vec1, Vector* Vec2) {
+Matrix* DotTransposeVecVec(Vector* Vec1, Vector* Vec2) {
 	Matrix* MatOut = NewMat(Vec1->size, Vec2->size);
 
 	for (int i = 0; i < Vec1->size; ++i) {
@@ -226,25 +239,6 @@ Matrix* DotTransposeVec(Vector* Vec1, Vector* Vec2) {
 		}
 	}
 	return MatOut;
-}
-
-Vector* DotVecsAndFree(Matrix* Mat1, Vector* Vec) {
-	if (Mat1->cols != Vec->size) {
-		printf("Cant dot this! %dx%d incompatble with %dx%d", Mat1->rows, Mat1->cols, Vec->size, 1);
-		exit(0);
-	}
-
-	Vector* VecOut = NewVec(Mat1->rows);
-
-	for (int i = 0; i < VecOut->size; ++i) {
-		double sum = 0;
-		for (int k = 0; k < Mat1->cols; ++k)
-			sum += Mat1->vals[i][k] * Vec->vals[k];
-		VecOut->vals[i] = sum;
-	}
-
-	FreeVec(Vec);
-	return VecOut;
 }
 
 Matrix* Transpose(Matrix* Mat) {
