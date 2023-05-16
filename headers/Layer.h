@@ -8,6 +8,7 @@ typedef struct Layer {
 	Matrix* Weights;
 	Vector* Biases;
 	Vector* input;
+    Vector* NoActivateInput;
 	Activation ActivationLayer;
 	Activation ActivationDervtive;
 }Layer;

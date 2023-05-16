@@ -6,12 +6,24 @@
 #include "Layer.h"
 
 double sigmoid(double x) {
-	return ((tanh(x)));
+	return ((1/(1+exp(-x))));
 }
 
 double sigmoidder(double x) {
-    double tah = tanh(x);
-	return ((1-tah*tah));
+    double sig = sigmoid(x);
+	return (sig*(1-sig));
+}
+
+double tanhder(double x){
+    double tanhh = tanh(x);
+    return 1-tanhh*tanhh;
+}
+double relu(double x){
+    return x <= 0 ? 0:x;
+}
+
+double reluder(double x){
+    return x <= 0 ? 0:1;
 }
 
 int ChangeEndianness(int value) {
@@ -33,7 +45,7 @@ void main()
 
     if (imageTrainFiles == NULL) {
         perror("File Not Found");
-        return 1;
+        return;
     }
 
     int magic_number;
@@ -45,52 +57,60 @@ void main()
     }
 
     srand(time(NULL));
-    Matrix* sample = NewMat(1000, 784);
-    Matrix* label = NewMat(1000, 10);
+    Matrix* sample = NewMat(50000, 784);
+    Matrix* label = NewMat(50000, 10);
 
     GetSample(sample, imageTrainFiles, 16);  // Read the first image starting at offset 16
 
     GetLabel(label, imageTrainLabel, 8);
 
-    for (int i = 0; i < 28; ++i) {
-        for (int j = 0; j < 28; ++j) {
-            if (sample->vals[7][i * 28 + j])
-                printf("%1.3f|", sample->vals[7][i * 28 + j]);
-            else
-                printf("     |");
-        }
-        printf("\n");
-    }
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,100, sigmoid, sigmoidder);
 
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,16, sigmoid, sigmoidder);
-
-	NewTailLayer(HeadLayer, 16, sigmoid, sigmoidder);
-
-    NewTailLayer(HeadLayer, 16, sigmoid, sigmoidder);
+    NewTailLayer(HeadLayer, 32, sigmoid,sigmoidder);
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
 	Vector* output = NewVec(1);
 
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 1; ++i) {
         LearnSample(HeadLayer,sample,label,0.1);
     }
 
 
-    for (int i = 0; i < 28; ++i) {
-        for (int j = 0; j < 28; ++j) {
-            if (sample->vals[55][i * 28 + j])
-                printf("%1.3f|", sample->vals[55][i * 28 + j]);
-            else
-                printf("     |");
+    PrintMat(HeadLayer->NextLayer->Weights);
+    Vector* err = NewVec(10);
+
+    while (1) {
+        int index;
+        printf("\nindex is: ");
+        scanf("%d",&index);
+        HeadLayer->input->vals = sample->vals[index];
+
+        output = Forward(HeadLayer);
+        double max = -1;
+        int maxnum;
+        for (int i = 0; i < 10; i++) {
+            if (max < output->vals[i]) {
+                max = output->vals[i];
+                maxnum = i;
+            }
+            err->vals[i] = output->vals[i] - label->vals[index][i];
         }
-        printf("\n");
+        for (int i = 0; i < 28; ++i) {
+            for (int j = 0; j < 28; ++j) {
+                if (sample->vals[index][i * 28 + j])
+                    printf("%1.3f|", sample->vals[index][i * 28 + j]);
+                else
+                    printf("     |");
+            }
+            printf("\n");
+        }
+        printf("\n\n");
+        PrintVec(output);
+        printf("\n\n");
+        PrintVec(err);
+        printf("%d", maxnum);
     }
-
-    HeadLayer->input->vals = sample->vals[55];
-
-    output = Forward(HeadLayer);
-    PrintVec(output);
 
 	FreeNetwork(HeadLayer);
 }
