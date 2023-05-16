@@ -37,15 +37,17 @@ int ChangeEndianness(int value) {
 
 
 
-void main()
+int main()
 {
 
+    srand(time(NULL));
+
     FILE* imageTrainFiles = fopen("../../data/train-images.idx3-ubyte", "rb");
-    FILE* imageTrainLabel = fopen("../../data/train-labels.idx1-ubyte", "rb");
+    FILE* imageTrainlabels = fopen("../../data/train-labels.idx1-ubyte", "rb");
 
     if (imageTrainFiles == NULL) {
         perror("File Not Found");
-        return;
+        return -1;
     }
 
     int magic_number;
@@ -53,38 +55,54 @@ void main()
 
     if (ChangeEndianness(magic_number) != 2051) {
         printf("Invalid magic number : %d\n", ChangeEndianness(magic_number));
-        return;
+        return -1;
     }
 
-    srand(time(NULL));
-    Matrix* sample = NewMat(50000, 784);
-    Matrix* label = NewMat(50000, 10);
+    Matrix* samples = NewMat(50000, 784);
+    Matrix* labels = NewMat(50000, 10);
 
-    GetSample(sample, imageTrainFiles, 16);  // Read the first image starting at offset 16
+    GetSample(samples, imageTrainFiles, 16);  // Read the first image starting at offset 16
 
-    GetLabel(label, imageTrainLabel, 8);
+    GetLabel(labels, imageTrainlabels, 8);
 
-        Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
+
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, sigmoid, sigmoidder);
 
     NewTailLayer(HeadLayer, 128, relu,reluder);
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
-    Vector* output = NewVec(1);
+    Vector* output;
 
-    for (int i = 0; i < 3; ++i) {
-        LearnSample(HeadLayer,sample,label,0.001);
+    for (int i = 0; i < 5; ++i) {
+        LearnBatch(HeadLayer,samples,labels,0.001);
     }
 
 
-    PrintMat(HeadLayer->NextLayer->Weights);
+    FreeMat(samples);
+    FreeMat(labels);
+
+    FILE* imageTestFiles = fopen("../../data/t10k-images.idx3-ubyte", "rb");
+    FILE* imageTestlabels = fopen("../../data/t10k-labels.idx1-ubyte", "rb");
+
+
+    samples = NewMat(10000, 784);
+    labels = NewMat(10000, 10);
+
+    GetSample(samples, imageTestFiles, 16);  // Read the first image starting at offset 16
+
+    GetLabel(labels, imageTestlabels, 8);
+
+
     Vector* err = NewVec(10);
+
+
 
     while (1) {
         int index;
         printf("\nindex is: ");
         scanf("%d",&index);
-        HeadLayer->input->vals = sample->vals[index];
+        HeadLayer->input->vals = samples->vals[index];
 
         output = Forward(HeadLayer);
         double max = -1;
@@ -94,12 +112,12 @@ void main()
                 max = output->vals[i];
                 maxnum = i;
             }
-            err->vals[i] = output->vals[i] - label->vals[index][i];
+            err->vals[i] = output->vals[i] - labels->vals[index][i];
         }
         for (int i = 0; i < 28; ++i) {
             for (int j = 0; j < 28; ++j) {
-                if (sample->vals[index][i * 28 + j])
-                    printf("%1.3f|", sample->vals[index][i * 28 + j]);
+                if (samples->vals[index][i * 28 + j])
+                    printf("%1.3f|", samples->vals[index][i * 28 + j]);
                 else
                     printf("     |");
             }
@@ -113,4 +131,6 @@ void main()
     }
 
     FreeNetwork(HeadLayer);
+
+    return -1;
 }

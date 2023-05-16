@@ -26,7 +26,7 @@ Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation
     newlayer->size = size;
     newlayer->NextLayer = 0;
     newlayer->LastLayer = 0;
-    newlayer->Weights = NewRandMat(size, input->size, -1, 1);
+    newlayer->Weights = NewRandMat(size, input->size, -1,1);
     newlayer->Biases = NewRandVec(size, -1, 1);
     newlayer->ActivationLayer = ActivationLayer;
     newlayer->ActivationDervtive = ActivationDervtive;
@@ -41,7 +41,7 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
     }
     Layer* tmp = LastLayer->NextLayer;
     tmp->size = size;
-    tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
+    tmp->Weights = NewRandMat(size, LastLayer->size,-1,1);
     tmp->Biases = NewRandVec(size, -1, 1);
     tmp->ActivationLayer = ActivationLayer;
     tmp->ActivationDervtive = ActivationDervtive;
@@ -64,7 +64,7 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
     NewLayer(FindTail(Head), size, ActivationLayer, ActivationDervtive);
 }
 
-void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
+void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
     if(head->input->size != Sample->cols){
         exit(-1);
     }
@@ -78,6 +78,10 @@ void LearnSample(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
         }
         BackPropogate(FindTail(head), err, learnrate);
         FreeVec(output);
+        if(!(i%1000)){
+            printf("%d \n",i);
+           // PrintMat(head->Weights);
+        }
     }
 }
 

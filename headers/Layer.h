@@ -20,6 +20,6 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 
 Vector* Forward(Layer* layer);
 void BackPropogate(Layer* layer, Vector* error_grad, double learnrate);
-void LearnSample(Layer* head, Matrix* Sample, Matrix* Labels,double learnrate);
+void LearnBatch(Layer* head, Matrix* Sample, Matrix* Labels,double learnrate);
 
 void FreeNetwork(Layer* layer);
