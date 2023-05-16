@@ -64,25 +64,43 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
     NewLayer(FindTail(Head), size, ActivationLayer, ActivationDervtive);
 }
 
-void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,double learnrate){
+void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,int epochs,double learnrate){
     if(head->input->size != Sample->cols){
         exit(-1);
     }
     Vector *output;
+    double errsum = 0;
+    for(int k = 0;k < epochs;k++){
     for(int i = 0; i < Sample->rows; ++i){
         Vector* err = NewVec(Labels->cols);
         head->input->vals = Sample->vals[i];
         output = Forward(head);
         for(int j = 0; j < output->size; ++j){
-            err->vals[j] = 2.0*(output->vals[j] - Labels->vals[i][j])/output->size;
+            double error =  (output->vals[j] - Labels->vals[i][j]);
+            err->vals[j] = 2*error/output->size;
+            errsum += error*error;
         }
+
         BackPropogate(FindTail(head), err, learnrate);
         FreeVec(output);
+
         if(!(i%1000)){
-            printf("%d \n",i);
-           // PrintMat(head->Weights);
+            system("clear");
+            printf("trraining model, sample %d/%d error is : %f ", errsum/(Labels->cols*1000),k,epochs);
+            errsum = 0;
+            printf("[");
+            for(int j = 0; j < Sample->rows; j+=1000) {
+                if (j < i)
+                    printf("\u25A0");
+                else
+                    printf(" ");
+
+            }
+            printf("]\n");
         }
     }
+    }
+    printf("\n");
 }
 
 Vector* Forward(Layer* layer){

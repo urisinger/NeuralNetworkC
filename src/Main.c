@@ -74,9 +74,7 @@ int main()
 
     Vector* output;
 
-    for (int i = 0; i < 5; ++i) {
-        LearnBatch(HeadLayer,samples,labels,0.001);
-    }
+    LearnBatch(HeadLayer,samples,labels,5,0.01);
 
 
     FreeMat(samples);
