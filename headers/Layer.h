@@ -10,7 +10,7 @@ typedef struct Layer {
 	Vector* Biases;
 	Vector* BiasOffset;
 	Vector* input;
-	Vector* NoActiveInput;
+  Vector* NoActivateInput;
 	Activation ActivationLayer;
 	Activation ActivationDervtive;
 }Layer;

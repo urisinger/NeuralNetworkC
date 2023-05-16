@@ -6,24 +6,24 @@
 #include "Layer.h"
 
 double sigmoid(double x) {
-	return (1.0/(1+exp(-x)));
+	return ((1/(1+exp(-x))));
 }
 
 double sigmoidder(double x) {
-    double sig = tanh(x);
+    double sig = sigmoid(x);
 	return (sig*(1-sig));
 }
 
-double tanhder(double x) {
-    return (1 - tanh(x) * tanh(x));
+double tanhder(double x){
+    double tanhh = tanh(x);
+    return 1-tanhh*tanhh;
+}
+double relu(double x){
+    return x <= 0 ? 0:x;
 }
 
-double relu(double x) {
-    return(x < 0 ? 0 : x);
-}
-
-double reluder(double x) {
-    return(x < 0 ? 0 : 1);
+double reluder(double x){
+    return x <= 0 ? 0:1;
 }
 
 int ChangeEndianness(int value) {
@@ -58,7 +58,7 @@ void main()
 
     if (imageTrainFiles == NULL) {
         perror("File Not Found");
-        return 1;
+        return;
     }
 
     int magic_number;
@@ -77,39 +77,27 @@ void main()
 
     GetLabel(label, imageTrainLabel, 8);
 
-    for (int i = 0; i < 28; ++i) {
-        for (int j = 0; j < 28; ++j) {
-            if (sample->vals[7][i * 28 + j])
-                printf("%1.3f|", sample->vals[7][i * 28 + j]);
-            else
-                printf("     |");
-        }
-        printf("\n");
-    }
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,100, sigmoid, sigmoidder);
 
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,16, relu, reluder);
-
-    NewTailLayer(HeadLayer, 16, relu, reluder);
-
+    NewTailLayer(HeadLayer, 32, sigmoid,sigmoidder);
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
 	Vector* output = NewVec(10);
-
-    for (int j = 0; j < 5; j++) {
-        for (int i = 0; i < 1000; ++i) {
-            LearnSample(HeadLayer, sample, label, 0.1, i * sample->rows / 1000, (i + 1) * sample->rows / 1000);
-        }
+  
+	for (int i = 0; i < 1; ++i) {
+        LearnSample(HeadLayer,sample,label,0.1);
     }
 
-    PrintMat(HeadLayer->Weights);
 
+    PrintMat(HeadLayer->NextLayer->Weights);
     Vector* err = NewVec(10);
 
     while (1) {
         int index;
         printf("\nindex is: ");
-        scanf_s("%d",&index);
+      
+        scanf("%d",&index);
         HeadLayer->input->vals = sample->vals[index];
 
         output = Forward(HeadLayer);
@@ -122,8 +110,15 @@ void main()
             }
             err->vals[i] = output->vals[i] - label->vals[index][i];
         }
-
-        PrintNum(sample, index);
+        for (int i = 0; i < 28; ++i) {
+            for (int j = 0; j < 28; ++j) {
+                if (sample->vals[index][i * 28 + j])
+                    printf("%1.3f|", sample->vals[index][i * 28 + j]);
+                else
+                    printf("     |");
+            }
+            printf("\n");
+        }
         printf("\n\n");
         PrintVec(output);
         printf("\n\n");
@@ -131,7 +126,5 @@ void main()
         printf("%d", maxnum);
     }
 
-    FreeNetwork(HeadLayer);
-
-
+	FreeNetwork(HeadLayer);
 }

@@ -2,6 +2,21 @@
 #include <stdlib.h>
 
 
+
+Vector* HadamardVec(Vector* vec1, Vector* vec2) {
+    if (vec1->size != vec2->size) {
+        exit(-1);  // Handle error: Vectors must have the same size
+    }
+
+    Vector* result = NewVec(vec1->size);
+    for (int i = 0; i < vec1->size; i++) {
+        result->vals[i] = vec1->vals[i] * vec2->vals[i];
+    }
+
+    return result;
+}
+
+
 Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation ActivationDervtive) {
 	Layer* newlayer = (Layer*)malloc(sizeof(Layer));
 	if (newlayer == NULL) {
@@ -101,21 +116,26 @@ Vector* Forward(Layer* layer){
 
 	Vector* tmp1 = DotVecMat(layer->Weights, layer->input);
 	Vector* next_in = AddVec(layer->Biases, tmp1);
-	Vector* in_copy = CopyVec(next_in);
-	layer->NoActiveInput = in_copy;
-	ApplyFuncVec(next_in, layer->ActivationLayer);
+    Vector* next_in_copy = CopyVec(next_in);
+
+    ApplyFuncVec(next_in, layer->ActivationLayer);
+
+    if(layer->NoActivateInput)
+        FreeVec(layer->NoActivateInput);
+
+    layer->NoActivateInput = next_in_copy;
 	FreeVec(tmp1);
 
 	if (!layer->NextLayer)
 		return next_in;
 
-	if (layer->NextLayer->input) {
+	if (layer->NextLayer->input)
 		FreeVec(layer->NextLayer->input);
 		layer->NextLayer->input = NULL;
 	}
 
-	layer->NextLayer->input = next_in;
-	Forward(layer->NextLayer);
+    layer->NextLayer->input = next_in;
+	return Forward(layer->NextLayer);
 }
 
 void FreeNetwork(Layer* layer) {
@@ -153,13 +173,12 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 	FreeMat(tmp);
 
 
+    if (layer->LastLayer) {
 
-	if (!layer->LastLayer)
-		free(next_err);
-		return;
-
-	for (int i = 0; i < error_grad->size; ++i) {
-		next_err->vals[i] *= layer->ActivationDervtive(layer->NoActiveInput->vals[i]);
-	}
-	BackPropogate(layer->LastLayer,next_err ,learnrate);
+        Vector* derivative = CopyVec(layer->input);
+        ApplyFuncVec(derivative,layer->ActivationDervtive);
+        Vector* next_err_scaled = HadamardVec(next_err, derivative);
+        FreeVec(next_err);
+        FreeVec(derivative);
+        BackPropogate(layer->LastLayer, next_err_scaled, learnrate);
 }
