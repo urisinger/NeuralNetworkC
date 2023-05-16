@@ -6,12 +6,12 @@
 #include "Layer.h"
 
 double sigmoid(double x) {
-	return ((1/(1+exp(-x))));
+    return ((1/(1+exp(-x))));
 }
 
 double sigmoidder(double x) {
     double sig = sigmoid(x);
-	return (sig*(1-sig));
+    return (sig*(1-sig));
 }
 
 double tanhder(double x){
@@ -33,19 +33,6 @@ int ChangeEndianness(int value) {
     result |= (value & 0x00FF0000) >> 8;
     result |= (value & 0xFF000000) >> 24;
     return result;
-}
-
-void PrintNum(Matrix* sample, int index) {
-
-    for (int i = 0; i < 28; ++i) {
-        for (int j = 0; j < 28; ++j) {
-            if (sample->vals[index][i * 28 + j])
-                printf("%1.3f|", sample->vals[index][i * 28 + j]);
-            else
-                printf("     |");
-        }
-        printf("\n");
-    }
 }
 
 
@@ -77,16 +64,16 @@ void main()
 
     GetLabel(label, imageTrainLabel, 8);
 
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,100, sigmoid, sigmoidder);
+        Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
 
-    NewTailLayer(HeadLayer, 32, sigmoid,sigmoidder);
+    NewTailLayer(HeadLayer, 128, relu,reluder);
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
-	Vector* output = NewVec(10);
-  
-	for (int i = 0; i < 1; ++i) {
-        LearnSample(HeadLayer,sample,label,0.1);
+    Vector* output = NewVec(1);
+
+    for (int i = 0; i < 3; ++i) {
+        LearnSample(HeadLayer,sample,label,0.001);
     }
 
 
@@ -96,7 +83,6 @@ void main()
     while (1) {
         int index;
         printf("\nindex is: ");
-      
         scanf("%d",&index);
         HeadLayer->input->vals = sample->vals[index];
 
@@ -126,5 +112,5 @@ void main()
         printf("%d", maxnum);
     }
 
-	FreeNetwork(HeadLayer);
+    FreeNetwork(HeadLayer);
 }
