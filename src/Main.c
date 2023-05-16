@@ -44,7 +44,7 @@ int main()
     GetLabel(labels, imageTrainlabels, 8);      //read labels
 
     //create network
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, sigmoid, sigmoidder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
 
     NewTailLayer(HeadLayer, 128, relu,reluder);
 
@@ -52,7 +52,7 @@ int main()
 
     //train the network
     clock_t start = clock();
-    LearnBatch(HeadLayer, images,labels,1,0.001);
+    LearnBatch(HeadLayer, images,labels,3,0.001);
     printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples
@@ -79,13 +79,13 @@ int main()
 
         for (int j = 0; j < 10; j++) {
             double error = labels->vals[i][j] - output->vals[j];
-            err->vals[j] += 2 * error / 10000.0;
+            err->vals[j] += error;
             errsum += error * error/10.0;
         }
 
     }
     printf("\n error is : %f\n", errsum / 10000.0);
-    PrintVec(err);
+    PrintVec(VecScaler(err, 1 / 10000.0));
     
     err = NewVec(10);
 

@@ -1,20 +1,5 @@
 # ninja log v5
-19	162	7058728433348641	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	90614a2fe2491f98
-6	198	7058728433738622	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-11	206	7058728433808555	CMakeFiles/NeuralNetwork.dir/src/LinearAlgebra.c.obj	5af661e390dd286a
-206	458	7058728436298550	NeuralNetwork.exe	2c8314099bc3134c
-21	565	7058730382443889	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-566	931	7058730386093803	NeuralNetwork.exe	2c8314099bc3134c
-22	410	7058730581925037	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-411	689	7058730584745331	NeuralNetwork.exe	2c8314099bc3134c
 37	417	7058733174507787	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	90614a2fe2491f98
-29	443	7058733174777723	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-444	735	7058733177647700	NeuralNetwork.exe	2c8314099bc3134c
-5	388	7058735082603864	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-390	759	7058735086213861	NeuralNetwork.exe	2c8314099bc3134c
-23	364	7058735540336743	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-365	623	7058735542916704	NeuralNetwork.exe	2c8314099bc3134c
-23	386	7058736167266051	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
-387	670	7058736170066426	NeuralNetwork.exe	2c8314099bc3134c
 22	430	7058736861599250	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	ef9f601bf2b5958d
+11	206	7058728433808555	CMakeFiles/NeuralNetwork.dir/src/LinearAlgebra.c.obj	5af661e390dd286a
 431	715	7058736864379190	NeuralNetwork.exe	2c8314099bc3134c

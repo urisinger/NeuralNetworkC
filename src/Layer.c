@@ -37,7 +37,7 @@ Layer* NewNetwork(Vector* input,int size, Activation ActivationLayer, Activation
         exit(1);
     }
     newlayer->input = input;
-    newlayer->NoActivateInput = 0;
+    newlayer->PreActivateOut = 0;
     newlayer->size = size;
     newlayer->NextLayer = 0;
     newlayer->LastLayer = 0;
@@ -62,7 +62,7 @@ void NewLayer(Layer* LastLayer,int size, Activation ActivationLayer, Activation 
     tmp->ActivationLayer = ActivationLayer;
     tmp->ActivationDervtive = ActivationDervtive;
     tmp->input = 0;
-    tmp->NoActivateInput = 0;
+    tmp->PreActivateOut = 0;
     tmp->NextLayer = 0;
     tmp->LastLayer = LastLayer;
 }
@@ -141,10 +141,10 @@ Vector* Forward(Layer* layer){
 
     ApplyFuncVec(next_in, layer->ActivationLayer);
 
-    if(layer->NoActivateInput)
-        FreeVec(layer->NoActivateInput);
+    if(layer->PreActivateOut)
+        FreeVec(layer->PreActivateOut);
 
-    layer->NoActivateInput = next_in_copy;
+    layer->PreActivateOut = next_in_copy;
 
     FreeVec(tmp1);
 
@@ -197,7 +197,7 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
         Vector* next_err = DotVecMat(weight_transpose, error_grad);
 
-        Vector* derivative = CopyVec(layer->input);
+        Vector* derivative = CopyVec(layer->LastLayer->PreActivateOut);
         ApplyFuncVec(derivative,layer->ActivationDervtive);
         Vector* next_err_scaled = HadamardVec(next_err, derivative);
         FreeMat(weight_transpose);

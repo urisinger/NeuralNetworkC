@@ -20,7 +20,7 @@ typedef struct Layer {
     Matrix* Weights;
     Vector* Biases;
     Vector* input;
-    Vector* NoActivateInput;
+    Vector* PreActivateOut;
     Activation ActivationLayer;
     Activation ActivationDervtive;
 }Layer;
