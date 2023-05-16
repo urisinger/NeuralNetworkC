@@ -35,6 +35,19 @@ int ChangeEndianness(int value) {
     return result;
 }
 
+void PrintNum(Matrix* sample, int index) {
+
+    for (int i = 0; i < 28; ++i) {
+        for (int j = 0; j < 28; ++j) {
+            if (sample->vals[index][i * 28 + j])
+                printf("%1.3f|", sample->vals[index][i * 28 + j]);
+            else
+                printf("     |");
+        }
+        printf("\n");
+    }
+}
+
 
 
 void main()
@@ -70,8 +83,8 @@ void main()
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
-	Vector* output = NewVec(1);
-
+	Vector* output = NewVec(10);
+  
 	for (int i = 0; i < 1; ++i) {
         LearnSample(HeadLayer,sample,label,0.1);
     }
@@ -83,6 +96,7 @@ void main()
     while (1) {
         int index;
         printf("\nindex is: ");
+      
         scanf("%d",&index);
         HeadLayer->input->vals = sample->vals[index];
 

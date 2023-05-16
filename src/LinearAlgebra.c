@@ -69,6 +69,7 @@ Matrix* CopyMat(Matrix* OldMat) {
 void FreeMat(Matrix* Mat) {
 	for (int i = 0; i < Mat->rows; free(Mat->vals[i]), ++i);
 	free(Mat->vals);
+	Mat->vals = NULL;
 	free(Mat);
 }
 
