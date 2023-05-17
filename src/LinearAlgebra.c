@@ -273,14 +273,6 @@ Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2) {
 	return Mat;
 }
 
-void ApplyFunc(Matrix* Mat, Activation function) {
-	for (int i = 0; i < Mat->rows; ++i) {
-		for (int j = 0; j < Mat->cols; ++j) {
-			Mat->vals[i][j] = function(Mat->vals[i][j]);
-		}
-	}
-
-}
 
 
 Vector* NewVec(int size) {
@@ -340,11 +332,4 @@ void RandomizeVec(Vector* Vec, double min, double max) {
 	for (int i = 0; i < Vec->size; ++i) {
 		Vec->vals[i] = min + ((double)rand() / (double)RAND_MAX) * (max - min);
 	}
-}
-
-Vector* ApplyFuncVec(Vector* Vec, Activation function) {
-	for (int i = 0; i < Vec->size; ++i) {
-		Vec->vals[i] = function(Vec->vals[i]);
-	}
-	return Vec;
 }

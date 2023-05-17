@@ -48,11 +48,11 @@ int main()
 
     NewTailLayer(HeadLayer, 128, relu,reluder);
 
-    NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
+    NewTailLayer(HeadLayer, 10, softmax, softmaxder);
 
     //train the network
     clock_t start = clock();
-    LearnBatch(HeadLayer, images,labels,3,0.001);
+    LearnBatch(HeadLayer, images,labels,3,0.01);
     printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples

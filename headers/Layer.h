@@ -3,14 +3,18 @@
 
 
 //layer functions
-double sigmoid(double x);
+void sigmoid(Vector* x);
 
-double sigmoidder(double x);
+void sigmoidder(Vector* x);
 
-double tanhder(double x);
-double relu(double x);
+//Vector* tanhder(Vector* x);
+void relu(Vector* x);
 
-double reluder(double x);
+void reluder(Vector* x);
+
+void softmax(Vector* x);
+
+void softmaxder(Vector* x);
 
 
 typedef struct Layer {

@@ -49,3 +49,13 @@
 129	304	7059654547069762	NeuralNetwork.exe	fe55cf091b344026
 3	340	7059657174062542	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	ca67f6bd47e84ec1
 341	564	7059657175888262	NeuralNetwork.exe	fe55cf091b344026
+44	431	7060556247871959	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	ca67f6bd47e84ec1
+39	434	7060556247911975	CMakeFiles/NeuralNetwork.dir/src/LinearAlgebra.c.obj	3d827b005258f330
+33	438	7060556247961946	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	827fd4c05c8e5580
+438	629	7060556249434624	NeuralNetwork.exe	fe55cf091b344026
+22	315	7060556517017916	CMakeFiles/NeuralNetwork.dir/src/Main.c.obj	827fd4c05c8e5580
+316	518	7060556518708329	NeuralNetwork.exe	fe55cf091b344026
+13	290	7060556716771571	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	ca67f6bd47e84ec1
+291	477	7060556718268292	NeuralNetwork.exe	fe55cf091b344026
+13	311	7060557282862490	CMakeFiles/NeuralNetwork.dir/src/Layer.c.obj	ca67f6bd47e84ec1
+312	516	7060557284522857	NeuralNetwork.exe	fe55cf091b344026

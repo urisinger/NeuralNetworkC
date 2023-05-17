@@ -1,7 +1,6 @@
 #pragma once
 #include <stdio.h>
 
-typedef double (*Activation)(double);
 
 typedef struct Matrix {
 	double** vals;
@@ -12,6 +11,9 @@ typedef struct Vector {
 	double* vals;
 	int size;
 }Vector;
+
+typedef void (*Activation)(Vector*);
+
 
 //constactors
 Matrix* NewMat(int rows, int cols);
@@ -59,7 +61,4 @@ Matrix* DotTransposeVecVec(Vector* Vec1, Vector* Vec2);
 Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2);
 
 Matrix* Transpose(Matrix* Mat);
-
-void ApplyFunc(Matrix* Mat, Activation function);
-Vector* ApplyFuncVec(Vector* Mat, Activation function);
 

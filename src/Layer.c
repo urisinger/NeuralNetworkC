@@ -4,29 +4,61 @@
 
 
 //layer functions
-double sigmoid(double x) {
-    return ((1 / (1 + exp(-x))));
+void sigmoid(Vector* x) {
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] = 1 / (1 + exp(-x->vals[i]));
+    }
 }
 
-double sigmoidder(double x) {
-    double sig = sigmoid(x);
-    return (sig * (1 - sig));
+void sigmoidder(Vector* x) {
+    
+    Vector* sig = NewVec(x->size);
+    sigmoid(sig);
+    for (int i = 0; i < sig->size; i++) {
+        x->vals[i] = sig->vals[i] * (1 - sig->vals[i]);
+    }
+    FreeVec(sig);
 }
 
-double tanhder(double x) {
+/*double tanhder(double x) {
     double tanhh = tanh(x);
     return 1 - tanhh * tanhh;
+}*/
+
+void relu(Vector* x) {
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] = x->vals[i] <= 0 ? 0 : x->vals[i];
+    }
 }
-double relu(double x) {
-    return x <= 0 ? 0 : x;
+
+void reluder(Vector* x) {
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] = x->vals[i] <= 0 ? 0 : 1;
+    }
 }
 
-double reluder(double x) {
-    return x <= 0 ? 0 : 1;
+void softmax(Vector* x) {
+
+    double sum = 0.0;
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] = exp(x->vals[i]);
+        sum += x->vals[i];
+    }
+
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] /= sum;
+    }
 }
 
 
-
+void softmaxder(Vector* x) {
+    Vector* softm = NewVec(x->size);
+    softmax(softm);
+    for (int i = 0; i < softm->size; i++) {
+        x->vals[i] = softm->vals[i] * (1 - softm->vals[i]);
+    }
+    FreeVec(softm);
+}
 
 
 
@@ -86,11 +118,12 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 }
 
 
-void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,int epochs,double learnrate){
-    if(head->input->size != Sample->cols){
+
+void LearnBatch(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate) {
+    if (head->input->size != Sample->cols) {
         exit(-1);
     }
-    Vector *output;
+    Vector* output;
     double errsum = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
@@ -112,7 +145,7 @@ void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,int epochs,double l
 
             //print shit
             if (!(i % 1000)) {
-                
+
                 system("cls");
                 printf("trraining model... sample %d/%d. error is : %f ", k, epochs, errsum / (Labels->cols * 1000));
                 errsum = 0;
@@ -125,7 +158,7 @@ void LearnBatch(Layer * head, Matrix* Sample, Matrix* Labels,int epochs,double l
 
                 }
                 printf("]\n");
-                printf("time since last batch: %f", (double)(clock() - lastbatch)/CLOCKS_PER_SEC);
+                printf("time since last batch: %f", (double)(clock() - lastbatch) / CLOCKS_PER_SEC);
                 lastbatch = clock();
             }
         }
@@ -139,7 +172,7 @@ Vector* Forward(Layer* layer){
     Vector* next_in = AddVec(layer->Biases, tmp1);
     Vector* next_in_copy = CopyVec(next_in);
 
-    ApplyFuncVec(next_in, layer->ActivationLayer);
+    layer->ActivationLayer(next_in);
 
     if(layer->PreActivateOut)
         FreeVec(layer->PreActivateOut);
@@ -198,7 +231,7 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
         Vector* next_err = DotVecMat(weight_transpose, error_grad);
 
         Vector* derivative = CopyVec(layer->LastLayer->PreActivateOut);
-        ApplyFuncVec(derivative,layer->ActivationDervtive);
+        layer->ActivationDervtive(derivative);
         Vector* next_err_scaled = HadamardVec(next_err, derivative);
         FreeMat(weight_transpose);
         FreeVec(error_grad);
