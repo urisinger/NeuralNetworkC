@@ -44,15 +44,15 @@ int main()
     GetLabel(labels, imageTrainlabels, 8);      //read labels
 
     //create network
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,100, relu, reluder);
 
-    NewTailLayer(HeadLayer, 128, relu,reluder);
+    NewTailLayer(HeadLayer, 32, relu,reluder);
 
-    NewTailLayer(HeadLayer, 10, softmax, softmaxder);
+    NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
     //train the network
     clock_t start = clock();
-    LearnBatch(HeadLayer, images,labels,3,0.01);
+    LearnBatch(HeadLayer, images,labels,3,0.1);
     printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples

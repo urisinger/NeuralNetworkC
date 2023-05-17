@@ -7,7 +7,10 @@ void sigmoid(Vector* x);
 
 void sigmoidder(Vector* x);
 
-//Vector* tanhder(Vector* x);
+void tanh2(Vector* x);
+
+void tanhder(Vector* x);
+
 void relu(Vector* x);
 
 void reluder(Vector* x);
@@ -15,6 +18,7 @@ void reluder(Vector* x);
 void softmax(Vector* x);
 
 void softmaxder(Vector* x);
+
 
 
 typedef struct Layer {

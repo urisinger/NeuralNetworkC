@@ -333,3 +333,4 @@ void RandomizeVec(Vector* Vec, double min, double max) {
 		Vec->vals[i] = min + ((double)rand() / (double)RAND_MAX) * (max - min);
 	}
 }
+
