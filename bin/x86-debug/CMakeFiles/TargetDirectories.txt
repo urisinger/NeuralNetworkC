@@ -1,3 +1,0 @@
-C:/dev/NeuralNetwork/bin/x86-debug/CMakeFiles/NeuralNetwork.dir
-C:/dev/NeuralNetwork/bin/x86-debug/CMakeFiles/edit_cache.dir
-C:/dev/NeuralNetwork/bin/x86-debug/CMakeFiles/rebuild_cache.dir
