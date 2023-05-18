@@ -33,6 +33,8 @@ typedef struct Layer {
     Activation ActivationDervtive;
 }Layer;
 
+
+
 Layer* NewNetwork(Vector* input, int size, Activation ActivationLayer, Activation ActivationDervtive);
 void NewLayer(Layer* LastLayer, int size, Activation ActivationLayer, Activation ActivationDervtive);
 Layer* FindTail(Layer* Head);

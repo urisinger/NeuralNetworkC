@@ -62,3 +62,4 @@ Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2);
 
 Matrix* Transpose(Matrix* Mat);
 
+void ShuffleMatrixRows(Matrix* matrix1, Matrix* matrix2);

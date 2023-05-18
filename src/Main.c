@@ -44,9 +44,9 @@ int main()
     GetLabel(labels, imageTrainlabels, 8);      //read labels
 
     //create network
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,32, relu, reluder);
 
-    NewTailLayer(HeadLayer, 32, relu,reluder);
+    NewTailLayer(HeadLayer, 16, relu,reluder);
 
     NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
 
@@ -106,7 +106,7 @@ int main()
     int index;
     while (getchar()) {
         index = rand()%10000;
-        system("clear");
+        system("cls");
         HeadLayer->input = NewVec(784);
         HeadLayer->input->vals = images->vals[index];
 

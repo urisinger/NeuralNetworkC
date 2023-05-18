@@ -23,6 +23,24 @@ Matrix* NewUniformMat(int rows, int cols, double val) {
 	return Mat;
 }
 
+void ShuffleMatrixRows(Matrix* matrix1, Matrix* matrix2) {
+	int rows = matrix1->rows;
+
+	for (int i = rows - 1; i > 0; i--) {
+		int j = rand() % (i + 1);
+
+		// Swap rows i and j in matrix1
+		double* temp1 = matrix1->vals[i];
+		matrix1->vals[i] = matrix1->vals[j];
+		matrix1->vals[j] = temp1;
+
+		// Swap rows i and j in matrix2
+		double* temp2 = matrix2->vals[i];
+		matrix2->vals[i] = matrix2->vals[j];
+		matrix2->vals[j] = temp2;
+	}
+}
+
 void GetSample(Matrix* mat, FILE* dataFile, size_t offset) {
 	fseek(dataFile, offset, SEEK_SET);
 

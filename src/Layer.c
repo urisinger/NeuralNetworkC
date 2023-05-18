@@ -83,6 +83,7 @@ Layer* NewNetwork(Vector* input, int size, Activation ActivationLayer, Activatio
     newlayer->NextLayer = 0;
     newlayer->LastLayer = 0;
     newlayer->Weights = NewRandMat(size, input->size, -1, 1);
+    //PrintMat(newlayer->Weights);
     newlayer->Biases = NewRandVec(size, -1, 1);
     newlayer->ActivationLayer = ActivationLayer;
     newlayer->ActivationDervtive = ActivationDervtive;
@@ -99,6 +100,7 @@ void NewLayer(Layer* LastLayer, int size, Activation ActivationLayer, Activation
     Layer* tmp = LastLayer->NextLayer;
     tmp->size = size;
     tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
+    //PrintMat(tmp->Weights);
     tmp->Biases = NewRandVec(size, -1, 1);
     tmp->ActivationLayer = ActivationLayer;
     tmp->ActivationDervtive = ActivationDervtive;
@@ -137,6 +139,7 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
     int accuracy = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
+        ShuffleMatrixRows(Sample,Labels);
         for (int i = 0; i < Sample->rows; ++i) {
 
             //find err
@@ -175,14 +178,14 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
             //print shit
             if (!(i % 300)) {
 
-                system("clear");
+                system("cls");
                 printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (300),accuracy/300.0);
                 errsum = 0;
                 accuracy = 0;
                 printf("[");
                 for (int j = 0; j < Sample->rows; j += 300) {
                     if (j < i)
-                        printf("⬛");
+                        printf("|");
                     else
                         printf(" ");
 
