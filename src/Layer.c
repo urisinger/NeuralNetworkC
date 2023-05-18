@@ -176,14 +176,14 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float l
 
             //PrintMat(FindTail(head)->Weights);
             //print shit
-            if (!(i % 300)) {
+            if (!(i % 20000)) {
 
                 system("cls");
-                printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (300),accuracy/300.0);
+                printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (20000),accuracy/ 20000.0);
                 errsum = 0;
                 accuracy = 0;
                 printf("[");
-                for (int j = 0; j < Sample->rows; j += 300) {
+                for (int j = 0; j < Sample->rows; j += 20000) {
                     if (j < i)
                         printf("|");
                     else
