@@ -3,6 +3,7 @@
 #include <time.h>
 #include <math.h>
 
+
 #include "Layer.h"
 
 int ChangeEndianness(int value) {
@@ -52,8 +53,8 @@ int main()
 
     //train the network
     clock_t start = clock();
-    LearnGroup(HeadLayer, images, labels, 10, 0.3);
-    printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
+    LearnGroup(HeadLayer, images, labels, 3, 0.3f);
+    printf("%f", (float)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples
     FreeMat(images);
@@ -70,12 +71,12 @@ int main()
 
     GetLabel(labels, imageTestlabels, 8);   //read labels
 
-    double errsum = 0;
+    float errsum = 0;
     int accuracy = 0;
     for (int i = 0; i < 10000; i++) {
         HeadLayer->input->vals = images->vals[i];
         Vector* output = Forward(HeadLayer);
-        double max = 0;
+        float max = 0;
         int maxindex;
         for(int k = 0; k < 10; k++){
             if(output->vals[k] > max){
@@ -111,7 +112,7 @@ int main()
         HeadLayer->input->vals = images->vals[index];
 
         Vector* output = ForwardNoWaste(HeadLayer,HeadLayer->input);
-        double max = -1;
+        float max = -1;
         int maxnum;
         for (int i = 0; i < 10; i++) {
             if (max < output->vals[i]) {

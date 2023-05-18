@@ -29,7 +29,7 @@ void tanh2(Vector* x) {
 
 void tanhder(Vector* x) {
     for (int i = 0; i < x->size; i++) {
-        double tanhh = tanh(x->vals[i]);
+        float tanhh = tanh(x->vals[i]);
         x->vals[i] = 1 - tanhh * tanhh;
     }
 }
@@ -48,7 +48,7 @@ void reluder(Vector* x) {
 
 void softmax(Vector* x) {
 
-    double sum = 0.0;
+    float sum = 0.0;
     for (int i = 0; i < x->size; i++) {
         x->vals[i] = exp(x->vals[i]);
         sum += x->vals[i];
@@ -130,12 +130,12 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 
 
 
-void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate) {
+void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float learnrate) {
     if (head->input->size != Sample->cols) {
         exit(-1);
     }
     Vector* output;
-    double errsum = 0;
+    float errsum = 0;
     int accuracy = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
@@ -147,12 +147,12 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
             head->input->vals = Sample->vals[i];
             output = Forward(head);
             for (int j = 0; j < output->size; ++j) {
-                double error = (output->vals[j] - Labels->vals[i][j]);
+                float error = (output->vals[j] - Labels->vals[i][j]);
                 err->vals[j] = 2 * error / output->size;
                 errsum -= Labels->vals[i][j] * log(output->vals[j] + 1e-9)/log(output->size);
             }
 
-            double max = 0;
+            float max = 0;
             int maxindex;
             for(int j = 0; j < 10; j++){
                 if(output->vals[j] > max){
@@ -191,7 +191,7 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
 
                 }
                 printf("]\n");
-                printf("time since last batch: %f\n", (double)(clock() - lastbatch) / CLOCKS_PER_SEC);
+                printf("time since last batch: %f\n", (float)(clock() - lastbatch) / CLOCKS_PER_SEC);
                 lastbatch = clock();
             }
         }
@@ -260,7 +260,7 @@ void FreeNetwork(Layer* layer) {
     free(layer);
 }
 
-void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
+void BackPropogate(Layer* layer, Vector* error_grad, float learnrate) {
 
     Vector* derivative = CopyVec(layer->PreActivateOut);
     layer->ActivationDervtive(derivative);
