@@ -39,7 +39,9 @@ Layer* FindTail(Layer* Head);
 void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation ActivationDervtive);
 
 Vector* Forward(Layer* layer);
+Vector* ForwardNoWaste(Layer* layer,Vector* input);
 void BackPropogate(Layer* layer, Vector* error_grad, double learnrate);
-void LearnBatch(Layer* head, Matrix* Sample, Matrix* Labels,int epochs, double learnrate);
+void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate);
 
 void FreeNetwork(Layer* layer);
+void FreeInputs(Layer* layer);

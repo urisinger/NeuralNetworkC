@@ -1,6 +1,7 @@
 #include "Layer.h"
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 
 //layer functions
@@ -60,12 +61,12 @@ void softmax(Vector* x) {
 
 
 void softmaxder(Vector* x) {
-    Vector* softm = NewVec(x->size);
-    softmax(softm);
-    for (int i = 0; i < softm->size; i++) {
-        x->vals[i] = softm->vals[i] * (1 - softm->vals[i]);
+
+    softmax(x);
+    for (int i = 0; i < x->size; i++) {
+        //printf("%f\n",x->vals[i]);
+        x->vals[i] = x->vals[i] * (1 - x->vals[i]);
     }
-    FreeVec(softm);
 }
 
 
@@ -127,12 +128,13 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 
 
 
-void LearnBatch(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate) {
+void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate) {
     if (head->input->size != Sample->cols) {
         exit(-1);
     }
     Vector* output;
     double errsum = 0;
+    int accuracy = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
         for (int i = 0; i < Sample->rows; ++i) {
@@ -144,34 +146,78 @@ void LearnBatch(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
             for (int j = 0; j < output->size; ++j) {
                 double error = (output->vals[j] - Labels->vals[i][j]);
                 err->vals[j] = 2 * error / output->size;
-                errsum += error * error;
+                errsum -= Labels->vals[i][j] * log(output->vals[j] + 1e-9)/log(output->size);
+            }
+
+            double max = 0;
+            int maxindex;
+            for(int j = 0; j < 10; j++){
+                if(output->vals[j] > max){
+                    max = output->vals[j];
+                    maxindex = j;
+                }
+            }
+
+            for(int j = 0; j < 10; j++){
+                if(Labels->vals[i][j] > 0.99){
+                    accuracy += (j==maxindex);
+                    break;
+                }
             }
 
             //backprop
             BackPropogate(FindTail(head), err, learnrate);
+
+
             FreeVec(output);
 
+            //PrintMat(FindTail(head)->Weights);
             //print shit
-            if (!(i % 1000)) {
+            if (!(i % 300)) {
 
-                system("cls");
-                printf("trraining model... sample %d/%d. error is : %f ", k, epochs, errsum / (Labels->cols * 1000));
+                system("clear");
+                printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (300),accuracy/300.0);
                 errsum = 0;
+                accuracy = 0;
                 printf("[");
-                for (int j = 0; j < Sample->rows; j += 1000) {
+                for (int j = 0; j < Sample->rows; j += 300) {
                     if (j < i)
-                        printf("|");
+                        printf("⬛");
                     else
                         printf(" ");
 
                 }
                 printf("]\n");
-                printf("time since last batch: %f", (double)(clock() - lastbatch) / CLOCKS_PER_SEC);
+                printf("time since last batch: %f\n", (double)(clock() - lastbatch) / CLOCKS_PER_SEC);
                 lastbatch = clock();
             }
         }
     }
     printf("\n");
+}
+
+void FreeInputs(Layer* layer){
+    FreeVec(layer->input);
+    FreeVec(layer->PreActivateOut);
+    if (layer->NextLayer) {
+        FreeInputs(layer->NextLayer);
+    }
+}
+
+Vector* ForwardNoWaste(Layer* layer,Vector* input){
+    Vector* tmp1 = DotVecMat(layer->Weights, input);
+    Vector* next_in = AddVec(layer->Biases, tmp1);
+
+
+    layer->ActivationLayer(next_in);
+
+    FreeVec(tmp1);
+    FreeVec(input);
+
+    if (!layer->NextLayer)
+        return next_in;
+
+    return ForwardNoWaste(layer->NextLayer,next_in);
 }
 
 Vector* Forward(Layer* layer) {
@@ -203,6 +249,8 @@ Vector* Forward(Layer* layer) {
 void FreeNetwork(Layer* layer) {
     FreeVec(layer->Biases);
     FreeMat(layer->Weights);
+    FreeVec(layer->input);
+    FreeVec(layer->PreActivateOut);
     if (layer->NextLayer) {
         FreeNetwork(layer->NextLayer);
     }
@@ -243,9 +291,6 @@ void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
         Vector* next_err = DotVecMat(weight_transpose, error_grad_scaled);
 
-        /*Vector* derivative = CopyVec(layer->LastLayer->PreActivateOut);
-        layer->LastLayer->ActivationDervtive(derivative);
-        Vector* next_err_scaled = HadamardVec(next_err, derivative);*/
         FreeMat(weight_transpose);
         FreeVec(error_grad);
         FreeVec(error_grad_scaled);

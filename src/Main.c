@@ -22,7 +22,7 @@ int main()
     FILE* imageTrainFiles = fopen("../../data/train-images.idx3-ubyte", "rb");
     FILE* imageTrainlabels = fopen("../../data/train-labels.idx1-ubyte", "rb");
 
-    if (imageTrainFiles == NULL) {
+    if (imageTrainFiles == NULL || imageTrainlabels == NULL) {
         perror("File Not Found");
         return -1;
     }
@@ -44,7 +44,7 @@ int main()
     GetLabel(labels, imageTrainlabels, 8);      //read labels
 
     //create network
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,100, relu, reluder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
 
     NewTailLayer(HeadLayer, 32, relu,reluder);
 
@@ -52,7 +52,7 @@ int main()
 
     //train the network
     clock_t start = clock();
-    LearnBatch(HeadLayer, images,labels,3,0.1);
+    LearnGroup(HeadLayer, images, labels, 10, 0.3);
     printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples
@@ -70,33 +70,47 @@ int main()
 
     GetLabel(labels, imageTestlabels, 8);   //read labels
 
-    Vector* err = NewVec(10);
-
     double errsum = 0;
+    int accuracy = 0;
     for (int i = 0; i < 10000; i++) {
         HeadLayer->input->vals = images->vals[i];
         Vector* output = Forward(HeadLayer);
-
+        double max = 0;
+        int maxindex;
+        for(int k = 0; k < 10; k++){
+            if(output->vals[k] > max){
+                max = output->vals[k];
+                maxindex = k;
+            }
+        }
+        for(int k = 0; k < 10; k++){
+            if(labels->vals[i][k] > 0.99){
+                accuracy += (k==maxindex);
+                break;
+            }
+        }
         for (int j = 0; j < 10; j++) {
-            double error = labels->vals[i][j] - output->vals[j];
-            err->vals[j] += error;
-            errsum += error * error/10.0;
+            errsum -= labels->vals[i][j] * log(output->vals[j] + 1e-9)/log(10);
         }
 
     }
-    printf("\n error is : %f\n", errsum / 10000.0);
-    PrintVec(VecScaler(err, 1 / 10000.0));
-    
-    err = NewVec(10);
+
+    printf("\n error is : %f\n", errsum/10000);
+    printf("the accuracy is: %f",accuracy/10000.0);
+
+    Vector* err = NewVec(10);
+
+    FreeInputs(HeadLayer);
 
     //test samples
-    while (1) {
-        int index;
-        printf("\nindex is: ");
-        scanf("%d",&index);
+    int index;
+    while (getchar()) {
+        index = rand()%10000;
+        system("clear");
+        HeadLayer->input = NewVec(784);
         HeadLayer->input->vals = images->vals[index];
 
-        Vector* output = Forward(HeadLayer);
+        Vector* output = ForwardNoWaste(HeadLayer,HeadLayer->input);
         double max = -1;
         int maxnum;
         for (int i = 0; i < 10; i++) {
