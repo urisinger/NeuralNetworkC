@@ -3,12 +3,12 @@
 
 
 typedef struct Matrix {
-	float** vals;
+	double** vals;
 	int rows, cols;
 }Matrix;
 
 typedef struct Vector {
-	float* vals;
+	double* vals;
 	int size;
 }Vector;
 
@@ -17,13 +17,13 @@ typedef void (*Activation)(Vector*);
 
 //constactors
 Matrix* NewMat(int rows, int cols);
-Matrix* NewUniformMat(int rows, int cols, float val);
-Matrix* NewRandMat(int rows, int cols, float min, float max);
+Matrix* NewUniformMat(int rows, int cols, double val);
+Matrix* NewRandMat(int rows, int cols, double min, double max);
 Matrix* CopyMat(Matrix* OldMat);
 
 Vector* NewVec(int size);
-Vector* NewUniformVec(int size, float val);
-Vector* NewRandVec(int size, float min, float max);
+Vector* NewUniformVec(int size, double val);
+Vector* NewRandVec(int size, double min, double max);
 Vector* CopyVec(Vector* OldMat);
 
 
@@ -36,13 +36,13 @@ void PrintMat(Matrix* Mat);
 void PrintVec(Vector* Vec);
 
 //fillers
-void UniformMat(Matrix* Mat, float val);
-void RandomizeMat(Matrix* Mat, float min, float max);	
+void UniformMat(Matrix* Mat, double val);
+void RandomizeMat(Matrix* Mat, double min, double max);
 void GetSample(Matrix* Mat, FILE* dataFile, size_t offset);
 void GetLabel(Matrix* mat, FILE* dataFile, size_t offset);
 
-void UniformVec(Vector* Vec, float val);
-void RandomizeVec(Vector* Vec, float min, float max);
+void UniformVec(Vector* Vec, double val);
+void RandomizeVec(Vector* Vec, double min, double max);
 
 //opers
 Vector* AddVec(Vector* Vec1, Vector* Vec2);
@@ -50,8 +50,8 @@ Matrix* AddMat(Matrix* Mat1, Matrix* Mat2);
 Vector* SubVec(Vector* Vec1, Vector* Vec2);
 Matrix* SubMat(Matrix* Mat1, Matrix* Mat2);
 
-Matrix* MatScaler(Matrix* Mat, float scaler);
-Vector* VecScaler(Vector* Vec, float scaler);
+Matrix* MatScaler(Matrix* Mat, double scaler);
+Vector* VecScaler(Vector* Vec, double scaler);
 
 Vector* HadamardVec(Vector* vec1, Vector* vec2);
 

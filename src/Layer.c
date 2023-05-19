@@ -12,13 +12,10 @@ void sigmoid(Vector* x) {
 }
 
 void sigmoidder(Vector* x) {
-
-    Vector* sig = NewVec(x->size);
-    sigmoid(sig);
-    for (int i = 0; i < sig->size; i++) {
-        x->vals[i] = sig->vals[i] * (1 - sig->vals[i]);
+    sigmoid(x);
+    for (int i = 0; i < x->size; i++) {
+        x->vals[i] = x->vals[i] * (1 - x->vals[i])+0.1;
     }
-    FreeVec(sig);
 }
 
 void tanh2(Vector* x) {
@@ -29,7 +26,7 @@ void tanh2(Vector* x) {
 
 void tanhder(Vector* x) {
     for (int i = 0; i < x->size; i++) {
-        float tanhh = tanh(x->vals[i]);
+        double tanhh = tanh(x->vals[i]);
         x->vals[i] = 1 - tanhh * tanhh;
     }
 }
@@ -47,10 +44,16 @@ void reluder(Vector* x) {
 }
 
 void softmax(Vector* x) {
+    double max_val = x->vals[0];
+    for (int i = 1; i < x->size; i++) {
+        if (x->vals[i] > max_val) {
+            max_val = x->vals[i];
+        }
+    }
 
-    float sum = 0.0;
+    double sum = 0.0;
     for (int i = 0; i < x->size; i++) {
-        x->vals[i] = exp(x->vals[i]);
+        x->vals[i] = exp(x->vals[i] - max_val);
         sum += x->vals[i];
     }
 
@@ -60,15 +63,13 @@ void softmax(Vector* x) {
 }
 
 
-void softmaxder(Vector* x) {
 
+void softmaxder(Vector* x) {
     softmax(x);
     for (int i = 0; i < x->size; i++) {
-        //printf("%f\n",x->vals[i]);
-        x->vals[i] = x->vals[i] * (1 - x->vals[i]);
+        x->vals[i] *= (1 - x->vals[i]);
     }
 }
-
 
 
 //create a network and set the params
@@ -82,7 +83,7 @@ Layer* NewNetwork(Vector* input, int size, Activation ActivationLayer, Activatio
     newlayer->size = size;
     newlayer->NextLayer = 0;
     newlayer->LastLayer = 0;
-    newlayer->Weights = NewRandMat(size, input->size, -1, 1);
+    newlayer->Weights = NewRandMat(size, input->size, -sqrt(1.0/(size+input->size)),sqrt(1.0/(size+input->size)));
     //PrintMat(newlayer->Weights);
     newlayer->Biases = NewRandVec(size, -1, 1);
     newlayer->ActivationLayer = ActivationLayer;
@@ -99,9 +100,9 @@ void NewLayer(Layer* LastLayer, int size, Activation ActivationLayer, Activation
     }
     Layer* tmp = LastLayer->NextLayer;
     tmp->size = size;
-    tmp->Weights = NewRandMat(size, LastLayer->size, -1, 1);
+    tmp->Weights = NewRandMat(size, LastLayer->size, -sqrt(1.0/(size+LastLayer->size)),sqrt(1.0/(size+LastLayer->size)));
     //PrintMat(tmp->Weights);
-    tmp->Biases = NewRandVec(size, -1, 1);
+    tmp->Biases = NewRandVec(size, -sqrt(1.0/(size+LastLayer->size)),sqrt(1.0/(size+LastLayer->size)));
     tmp->ActivationLayer = ActivationLayer;
     tmp->ActivationDervtive = ActivationDervtive;
     tmp->input = 0;
@@ -130,16 +131,16 @@ void NewTailLayer(Layer* Head, int size, Activation ActivationLayer, Activation 
 
 
 
-void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float learnrate) {
+void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double learnrate) {
     if (head->input->size != Sample->cols) {
         exit(-1);
     }
     Vector* output;
-    float errsum = 0;
+    double errsum = 0;
     int accuracy = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
-        ShuffleMatrixRows(Sample,Labels);
+        //ShuffleMatrixRows(Sample,Labels);
         for (int i = 0; i < Sample->rows; ++i) {
 
             //find err
@@ -147,12 +148,12 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float l
             head->input->vals = Sample->vals[i];
             output = Forward(head);
             for (int j = 0; j < output->size; ++j) {
-                float error = (output->vals[j] - Labels->vals[i][j]);
+                double error = (output->vals[j] - Labels->vals[i][j]);
                 err->vals[j] = 2 * error / output->size;
                 errsum -= Labels->vals[i][j] * log(output->vals[j] + 1e-9)/log(output->size);
             }
 
-            float max = 0;
+            double max = 0;
             int maxindex;
             for(int j = 0; j < 10; j++){
                 if(output->vals[j] > max){
@@ -163,7 +164,7 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float l
 
             for(int j = 0; j < 10; j++){
                 if(Labels->vals[i][j] > 0.99){
-                    accuracy += (j==maxindex);
+                    accuracy += j==maxindex;
                     break;
                 }
             }
@@ -176,14 +177,14 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float l
 
             //PrintMat(FindTail(head)->Weights);
             //print shit
-            if (!(i % 20000)) {
+            if (!(i % 300)) {
 
-                system("cls");
-                printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (20000),accuracy/ 20000.0);
+                system("clear");
+                printf("Training model... Iteration %d/%d. error is : %f, accuracy is: %f\n", k+1, epochs, errsum / (300),accuracy/300.0);
                 errsum = 0;
                 accuracy = 0;
                 printf("[");
-                for (int j = 0; j < Sample->rows; j += 20000) {
+                for (int j = 0; j < Sample->rows; j += 300) {
                     if (j < i)
                         printf("|");
                     else
@@ -191,7 +192,7 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, float l
 
                 }
                 printf("]\n");
-                printf("time since last batch: %f\n", (float)(clock() - lastbatch) / CLOCKS_PER_SEC);
+                printf("time since last batch: %f\n", (double)(clock() - lastbatch) / CLOCKS_PER_SEC);
                 lastbatch = clock();
             }
         }
@@ -260,7 +261,7 @@ void FreeNetwork(Layer* layer) {
     free(layer);
 }
 
-void BackPropogate(Layer* layer, Vector* error_grad, float learnrate) {
+void BackPropogate(Layer* layer, Vector* error_grad, double learnrate) {
 
     Vector* derivative = CopyVec(layer->PreActivateOut);
     layer->ActivationDervtive(derivative);

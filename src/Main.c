@@ -3,7 +3,6 @@
 #include <time.h>
 #include <math.h>
 
-
 #include "Layer.h"
 
 int ChangeEndianness(int value) {
@@ -49,12 +48,12 @@ int main()
 
     NewTailLayer(HeadLayer, 16, relu,reluder);
 
-    NewTailLayer(HeadLayer, 10, sigmoid, sigmoidder);
+    NewTailLayer(HeadLayer, 10, softmax, softmaxder);
 
     //train the network
     clock_t start = clock();
-    LearnGroup(HeadLayer, images, labels, 3, 0.3f);
-    printf("%f", (float)(clock() - start)/CLOCKS_PER_SEC);
+    LearnGroup(HeadLayer, images, labels, 10, 0.1);
+    printf("%f", (double)(clock() - start)/CLOCKS_PER_SEC);
 
     //free samples
     FreeMat(images);
@@ -71,12 +70,12 @@ int main()
 
     GetLabel(labels, imageTestlabels, 8);   //read labels
 
-    float errsum = 0;
+    double errsum = 0;
     int accuracy = 0;
     for (int i = 0; i < 10000; i++) {
         HeadLayer->input->vals = images->vals[i];
         Vector* output = Forward(HeadLayer);
-        float max = 0;
+        double max = 0;
         int maxindex;
         for(int k = 0; k < 10; k++){
             if(output->vals[k] > max){
@@ -107,20 +106,9 @@ int main()
     int index;
     while (getchar()) {
         index = rand()%10000;
-        system("cls");
+        system("clear");
         HeadLayer->input = NewVec(784);
         HeadLayer->input->vals = images->vals[index];
-
-        Vector* output = ForwardNoWaste(HeadLayer,HeadLayer->input);
-        float max = -1;
-        int maxnum;
-        for (int i = 0; i < 10; i++) {
-            if (max < output->vals[i]) {
-                max = output->vals[i];
-                maxnum = i;
-            }
-            err->vals[i] = output->vals[i] - labels->vals[index][i];
-        }
 
         for (int i = 0; i < 28; ++i) {
             for (int j = 0; j < 28; ++j) {
@@ -130,6 +118,17 @@ int main()
                     printf("     |");
             }
             printf("\n");
+        }
+
+        Vector* output = ForwardNoWaste(HeadLayer,HeadLayer->input);
+        double max = -1;
+        int maxnum;
+        for (int i = 0; i < 10; i++) {
+            if (max < output->vals[i]) {
+                max = output->vals[i];
+                maxnum = i;
+            }
+            err->vals[i] = output->vals[i] - labels->vals[index][i];
         }
 
         printf("\n\n");
