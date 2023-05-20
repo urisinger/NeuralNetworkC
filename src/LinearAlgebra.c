@@ -9,15 +9,15 @@ Matrix* NewMat(int rows, int cols) {
 		exit(1);
 	Mat->rows = rows, Mat->cols = cols;
 
-	Mat->vals = (float**)malloc(sizeof(float*)*rows);
+	Mat->vals = (double**)malloc(sizeof(double*)*rows);
 	if (Mat->vals == NULL)
 		exit(1);
 	for (int i = 0; i < rows; ++i)
-		Mat->vals[i] = (float*)malloc(sizeof(float) * cols);
+		Mat->vals[i] = (double*)malloc(sizeof(double) * cols);
 	return Mat;
 }
 
-Matrix* NewUniformMat(int rows, int cols, float val) {
+Matrix* NewUniformMat(int rows, int cols, double val) {
 	Matrix* Mat = NewMat(rows, cols);
 	UniformMat(Mat, val);
 	return Mat;
@@ -30,12 +30,12 @@ void ShuffleMatrixRows(Matrix* matrix1, Matrix* matrix2) {
 		int j = rand() % (i + 1);
 
 		// Swap rows i and j in matrix1
-		float* temp1 = matrix1->vals[i];
+		double* temp1 = matrix1->vals[i];
 		matrix1->vals[i] = matrix1->vals[j];
 		matrix1->vals[j] = temp1;
 
 		// Swap rows i and j in matrix2
-		float* temp2 = matrix2->vals[i];
+		double* temp2 = matrix2->vals[i];
 		matrix2->vals[i] = matrix2->vals[j];
 		matrix2->vals[j] = temp2;
 	}
@@ -48,7 +48,7 @@ void GetSample(Matrix* mat, FILE* dataFile, size_t offset) {
 		for (int j = 0; j < mat->cols; j++) {
 			unsigned char pixel;
 			fread(&pixel, sizeof(unsigned char), 1, dataFile);
-			mat->vals[i][j] = (float)pixel / 255.0;  // Normalize the pixel value between 0 and 1
+			mat->vals[i][j] = (double)pixel / 255.0;  // Normalize the pixel value between 0 and 1
 		}
 	}
 }
@@ -68,7 +68,7 @@ void GetLabel(Matrix* mat, FILE* dataFile, size_t offset) {
 }
 
 
-Matrix* NewRandMat(int rows, int cols, float min, float max) {
+Matrix* NewRandMat(int rows, int cols, double min, double max) {
 	Matrix* Mat = NewMat(rows, cols);
 	RandomizeMat(Mat, min, max);
 	return Mat;
@@ -100,7 +100,7 @@ void PrintMat(Matrix* Mat) {
 	}
 }
 
-void UniformMat(Matrix* Mat, float val) {
+void UniformMat(Matrix* Mat, double val) {
 	for (int i = 0; i < Mat->rows; ++i) {
 		for (int j = 0; j < Mat->cols; ++j) {
 			Mat->vals[i][j] = val;
@@ -108,10 +108,10 @@ void UniformMat(Matrix* Mat, float val) {
 	}
 }
 
-void RandomizeMat(Matrix* Mat, float min, float max) {
+void RandomizeMat(Matrix* Mat, double min, double max) {
 	for (int i = 0; i < Mat->rows; ++i) {
 		for (int j = 0; j < Mat->cols; ++j) {
-			Mat->vals[i][j] = min + ((float)rand() / (float)RAND_MAX) * (max - min);
+			Mat->vals[i][j] = min + ((double)rand() / (double)RAND_MAX) * (max - min);
 		}
 	}
 }
@@ -176,7 +176,7 @@ Matrix* SubMat(Matrix* Mat1, Matrix* Mat2) {
 	return sum;
 }
 
-Matrix* MatScaler(Matrix* Mat, float scaler) {
+Matrix* MatScaler(Matrix* Mat, double scaler) {
 	Matrix* prodact = NewMat(Mat->rows, Mat->cols);
 
 	for (int i = 0; i < prodact->rows; ++i) {
@@ -187,7 +187,7 @@ Matrix* MatScaler(Matrix* Mat, float scaler) {
 	return prodact;
 }
 
-Vector* VecScaler(Vector* Vec, float scaler) {
+Vector* VecScaler(Vector* Vec, double scaler) {
 	Vector* prodact = NewVec(Vec->size);
 
 	for (int i = 0; i < Vec->size; ++i) {
@@ -220,7 +220,7 @@ Matrix* Dot(Matrix* Mat1, Matrix* Mat2) {
 
 	for (int i = 0; i < Mat->rows; ++i) {
 		for (int j = 0; j < Mat->cols; ++j) {
-			float sum = 0;
+			double sum = 0;
 			for (int k = 0; k < Mat1->cols; ++k) {
 				sum += Mat1->vals[i][k] * Mat2->vals[k][j];
 			}
@@ -240,7 +240,7 @@ Vector* DotVecMat(Matrix* Mat1, Vector* Vec) {
 	Vector* VecOut = NewVec(Mat1->rows);
 
 	for (int i = 0; i < VecOut->size; ++i) {
-		float sum = 0;
+		double sum = 0;
 		for (int k = 0; k < Mat1->cols; ++k)
 			sum += Mat1->vals[i][k] * Vec->vals[k];
 		VecOut->vals[i] = sum;
@@ -281,7 +281,7 @@ Matrix* TransposeDot(Matrix* Mat1, Matrix* Mat2) {
 
 	for (int i = 0; i < Mat->rows; ++i) {
 		for (int j = 0; j < Mat->cols; ++j) {
-			float sum = 0;
+			double sum = 0;
 			for (int k = 0; k < Mat1->cols; ++k) {
 				sum += Mat1->vals[i][k] * Mat2->vals[j][k];
 			}
@@ -299,20 +299,20 @@ Vector* NewVec(int size) {
 		exit(1);
 	Vec->size = size;
 
-	Vec->vals = (float*)malloc(sizeof(float) * size);
+	Vec->vals = (double*)malloc(sizeof(double) * size);
 	if (Vec->vals == NULL)
 		exit(1);
 	return Vec;
 }
 
-Vector* NewUniformVec(int size, float val) {
+Vector* NewUniformVec(int size, double val) {
 	Vector* Vec = NewVec(size);
 	UniformVec(Vec, val);
 
 	return Vec;
 }
 
-Vector* NewRandVec(int size, float min, float max) {
+Vector* NewRandVec(int size, double min, double max) {
 	Vector* Vec = NewVec(size);
 	RandomizeVec(Vec, min, max);
 	
@@ -340,15 +340,15 @@ void PrintVec(Vector* Vec) {
 }
 
 
-void UniformVec(Vector* Vec, float val) {
+void UniformVec(Vector* Vec, double val) {
 	for (int i = 0; i < Vec->size; ++i) {
 		Vec->vals[i] = val;
 	}
 }
 
-void RandomizeVec(Vector* Vec, float min, float max) {
+void RandomizeVec(Vector* Vec, double min, double max) {
 	for (int i = 0; i < Vec->size; ++i) {
-		Vec->vals[i] = min + ((float)rand() / (float)RAND_MAX) * (max - min);
+		Vec->vals[i] = min + ((double)rand() / (double)RAND_MAX) * (max - min);
 	}
 }
 

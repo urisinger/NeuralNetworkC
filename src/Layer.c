@@ -140,7 +140,7 @@ void LearnGroup(Layer* head, Matrix* Sample, Matrix* Labels, int epochs, double 
     int accuracy = 0;
     clock_t lastbatch = clock();
     for (int k = 0; k < epochs; k++) {
-        //ShuffleMatrixRows(Sample,Labels);
+        ShuffleMatrixRows(Sample,Labels);
         for (int i = 0; i < Sample->rows; ++i) {
 
             //find err

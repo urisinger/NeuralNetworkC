@@ -34,19 +34,19 @@ int main()
         printf("Invalid magic number : %d\n", ChangeEndianness(magic_number));
         return -1;
     }
-    
+
     //create samples and labels
-    Matrix* images = NewMat(50000, 784);
-    Matrix* labels = NewMat(50000, 10);
+    Matrix* images = NewMat(10000, 784);
+    Matrix* labels = NewMat(10000, 10);
 
     GetSample(images, imageTrainFiles, 16);  //read images
 
     GetLabel(labels, imageTrainlabels, 8);      //read labels
 
     //create network
-    Layer* HeadLayer = NewNetwork(NewVec(784) ,32, relu, reluder);
+    Layer* HeadLayer = NewNetwork(NewVec(784) ,128, relu, reluder);
 
-    NewTailLayer(HeadLayer, 16, relu,reluder);
+    NewTailLayer(HeadLayer, 32 , relu,reluder);
 
     NewTailLayer(HeadLayer, 10, softmax, softmaxder);
 
