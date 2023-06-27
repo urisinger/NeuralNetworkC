@@ -1,3 +1,5 @@
 # NeuralNetwork
 
-it works now
+Small neural network written in c
+
+
